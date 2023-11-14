@@ -1,19 +1,36 @@
 https://test.kevinmgranger.me {
 	log
 
-    handle /hello-world {
-        respond "sup?"
-    }
+	handle /hello-world {
+		respond "sup?"
+	}
 
-    redir /shibboleth /shibboleth/
+	redir /shibboleth /shibboleth/
 
-    handle /shibboleth/* {
-        reverse_proxy :8080
-    }
+	handle /shibboleth/* {
+		reverse_proxy :8080
+	}
 
-    handle {
-        respond "no url match" 404
-    }
+	# handle /foobar/* {
+	# 	rewrite * /shibboleth/{path}
+	# 	reverse_proxy :8080
+	# }
+	# handle /bazinga/* {
+	# 	rewrite * /shibboleth/{path}
+	# 	reverse_proxy :8080
+	# }
+
+	#    handle /shibboleth/* {
+	#        reverse_proxy :8080
+	#    }
+	#    
+	#    handle /shibboleth/* {
+	#        reverse_proxy :8080
+	#    }
+	#
+	handle {
+		respond "no url match" 404
+	}
 }
 
 import Caddyfile.d/*.caddyfile

@@ -17,7 +17,8 @@
           - start-dev
           - --proxy=edge
           - --hostname-debug=true
-          - --hostname-url=http://test.kevinmgranger.me/foobar
+          - --hostname-url=https://test.kevinmgranger.me/foobar
+          - --hostname-admin-url=https://test.kevinmgranger.me/bazinga
           - --http-relative-path=/shibboleth
       tags: [keycloak]
 
