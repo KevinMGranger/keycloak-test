@@ -17,7 +17,7 @@
           - start-dev
           - --proxy=edge
           - --hostname-debug=true
-          - --hostname-url=https://test.kevinmgranger.me/shibboleth
+          - --hostname-url=http://test.kevinmgranger.me/shibboleth
 
     - name: Install caddy
       become: true
