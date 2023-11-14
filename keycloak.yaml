@@ -1,0 +1,78 @@
+- name: Set up keycloak and the reverse proxy
+  hosts: "{{ keycloak_host }}"
+  vars:
+    published_port: "8080"
+    caddyfile: ./Caddyfile
+  tasks:
+    - name: Run podman keycloak container
+      containers.podman.podman_container:
+        rm: true
+        name: keycloak
+        image: quay.io/keycloak/keycloak:latest
+        ports: ["{{ published_port }}:8080"]
+        env:
+          KEYCLOAK_ADMIN: keycloak-admin
+          KEYCLOAK_ADMIN_PASSWORD: keycloak-admin-password
+        command:
+          - start-dev
+          - --proxy=edge
+          - --hostname-debug=true
+          - --hostname-url=https://kevinmgranger.me/auth
+
+    - name: Install caddy
+      become: true
+      ansible.builtin.package:
+        name: caddy
+      notify: [Restart caddy]
+    
+    - name: Check if caddy is available locally
+      ansible.builtin.command: which caddy
+      ignore_errors: true
+      register: which_caddy
+    
+    - name: Validate Caddyfile
+      become: false
+      delegate_to: localhost
+      ansible.builtin.command:
+        argv: [caddy, validate, --config, "{{ caddyfile }}"]
+      tags: [validate, file]
+      when: which_caddy.rc == 0
+
+    - name: Install Caddyfile
+      become: true
+      ansible.builtin.copy:
+        src:  "{{ caddyfile }}"
+        dest: /etc/caddy/Caddyfile
+        mode: u=rw,g=r,o=r
+      notify: [Reload caddy]
+      tags: [file]
+
+    - name: Enable and start Caddy
+      become: true
+      ansible.builtin.systemd_service:
+        name: caddy
+        state: started
+        enabled: true
+    
+    - name: Open http(s) ports
+      become: true
+      ansible.posix.firewalld:
+        zone: public
+        service: "{{ item }}"
+        state: enabled
+        permanent: true
+        immediate: true
+      loop: [http, https]
+ 
+  handlers:
+    - name: Restart caddy
+      become: true
+      ansible.builtin.systemd_service:
+        name: caddy
+        state: restarted
+
+    - name: Reload caddy
+      become: true
+      ansible.builtin.systemd_service:
+        name: caddy
+        state: reloaded

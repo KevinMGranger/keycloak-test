@@ -1,0 +1,19 @@
+https://test.kevinmgranger.me {
+	log
+
+    handle /hello-world {
+        respond "sup?"
+    }
+
+    redir /auth /auth/
+
+    handle /auth/* {
+        reverse_proxy :8080
+    }
+
+    handle {
+        respond "no url match" 404
+    }
+}
+
+import Caddyfile.d/*.caddyfile
