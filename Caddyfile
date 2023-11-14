@@ -5,9 +5,9 @@ https://test.kevinmgranger.me {
         respond "sup?"
     }
 
-    redir /auth /auth/
+    redir /shibboleth /shibboleth/
 
-    handle /auth/* {
+    handle /shibboleth/* {
         reverse_proxy :8080
     }
 
