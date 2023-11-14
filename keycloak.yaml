@@ -18,6 +18,8 @@
           - --proxy=edge
           - --hostname-debug=true
           - --hostname-url=http://test.kevinmgranger.me/shibboleth
+          - --http-relative-path=/shibboleth
+      tags: [keycloak]
 
     - name: Install caddy
       become: true
